@@ -1,5 +1,5 @@
 ## Curso DevOps - Tarefas
 
-Repositório para registrar as tarefas do curso. 
+Repositório para registrar as tarefas do curso.
 
-Cada aula e seus conjuntos de tarefas serão organizados por branches, indicadas pelo próprio nome.
+Cada aula e seus conjuntos de tarefas serão organizados por branches, indicadas pelo próprio nome. As tarefas serão executadas já no sistema linux.
