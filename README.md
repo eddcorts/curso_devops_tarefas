@@ -2,4 +2,4 @@
 
 Repositório para registrar as tarefas do curso.
 
-Cada aula e seus conjuntos de tarefas serão organizados por branches, indicadas pelo próprio nome. As tarefas serão executadas já no sistema linux.
+Cada aula e seu conjunto de tarefas estão organizados por pastas, indicadas pelo próprio nome. As tarefas serão executadas já no sistema linux.
