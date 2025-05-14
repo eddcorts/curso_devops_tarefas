@@ -1,0 +1,31 @@
+version: '3.8'
+
+x-common: &common-configs
+  restart: unless-stopped
+services:
+  sonarqube:
+    image: sonarqube:latest
+    <<: *common-configs
+    environment:
+      - SONAR_JDBC_URL=jdbc:postgresql://database:5432/sonarqube
+      - SONAR_JDBC_USERNAME=sonarqube
+      - SONAR_JDBC_PASSWORD=123456
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+    ports:
+      - 9000:9000
+    depends_on:
+      database:
+        condition: service_healthy
+
+  database:
+    image: postgres:latest
+    <<: *common-configs
+    environment:
+      - POSTGRES_USER=sonarqube
+      - POSTGRES_PASSWORD=123456
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    
