@@ -1,0 +1,125 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: postgres
+
+spec:
+  type: NodePort
+  selector:
+    app: postgres
+  ports:
+    - name: postgres
+      protocol: TCP
+      port: 5432
+      targetPort: 5432
+      nodePort: 30543
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+
+spec:
+  serviceName: postgres
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: postgres
+
+  template:
+    metadata:
+      labels:
+        app: postgres
+
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:17.5
+          env:
+            - name: POSTGRES_DB
+              value: example
+            - name: POSTGRES_USER
+              value: dev_user
+            - name: POSTGRES_PASSWORD
+              value: "123456"
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          ports:
+            - containerPort: 5432
+
+          volumeMounts:
+            - name: data-postgres
+              mountPath: /var/lib/postgresql/data
+
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", "devuser"]
+            initialDelaySeconds: 15
+            periodSeconds: 20
+
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "devuser"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+  volumeClaimTemplates:
+    - metadata:
+        name: data-postgres
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        storageClassName: standard
+        resources:
+          requests:
+            storage: 1Gi
+# ---
+# apiVersion: apps/v1
+# kind: StatefulSet
+
+# metadata:
+#   name: testsqlite3
+#   namespace: default
+#   labels:
+#     app: testsqlite3
+#     component: web
+
+# spec:
+#   serviceName: testsqlite3
+#   replicas: 2
+#   selector:
+#     matchLabels:
+#       app: testsqlite3
+#       component: web
+
+#   template:
+#     metadata:
+#       labels:
+#         app: testsqlite3
+#         component: web
+#     spec:
+#       containers:
+#         - name: app
+#           image: alpine/sqlite:latest
+#           # image: keinos/sqlite3
+#           ports:
+#             - containerPort: 3000
+#               name: app
+#               protocol: TCP
+#           volumeMounts:
+#             - name: data-sqlite
+#               mountPath: /data
+#           env:
+#             - name: DB_FILE
+#               value: "/data/foods.db"
